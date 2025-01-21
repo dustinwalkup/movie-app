@@ -30,12 +30,12 @@ export default async function Movie({ params }: MovieParams) {
   return (
     <main className="container mx-auto p-4 md:p-20">
       <div className="flex flex-col gap-20 md:flex-row md:gap-0">
-        <div className="flex min-w-[370px] items-center justify-center md:mr-20 md:items-start">
+        <div className="flex min-w-[200px] items-center justify-center md:mr-20 md:items-start">
           <Image
             alt={title}
             src={getPoster(movieDetails)}
-            width={370}
-            height={555}
+            width={200}
+            height={300}
             priority
             className="object-cover"
           />
