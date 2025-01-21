@@ -3,12 +3,11 @@ import Link from "next/link";
 
 import { getPoster, getReleaseYear } from "@/lib/utils";
 import { fetchMovies } from "@/lib/services/tmdb";
+import { MovieType } from "@/lib/types";
 import SearchInput from "@/components/search-input";
 
 interface SearchParamsProps {
-  searchParams: {
-    q: string;
-  };
+  searchParams: Promise<{ q: string }>;
 }
 
 export default async function Home({ searchParams }: SearchParamsProps) {
@@ -19,7 +18,7 @@ export default async function Home({ searchParams }: SearchParamsProps) {
       <SearchInput initialQuery={q} />
       <div className="grid grid-cols-1 gap-8 pt-4 text-white sm:grid-cols-2 sm:p-12 md:grid-cols-3 lg:grid-cols-4">
         {movies.length > 0 ? (
-          movies.map((movie: any) => {
+          movies.map((movie: MovieType) => {
             const releaseDate = getReleaseYear(movie.release_date);
             return (
               <div key={movie.id} className="">

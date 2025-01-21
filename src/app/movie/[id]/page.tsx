@@ -10,7 +10,11 @@ import {
 import { fetchMovie, fetchStreamingServices } from "@/lib/services/tmdb";
 import StreamingIcon from "@/components/streaming-icon";
 
-export default async function Movie({ params }: { params: { id: string } }) {
+type MovieParams = {
+  params: Promise<{ id: string }>;
+};
+
+export default async function Movie({ params }: MovieParams) {
   const { id } = await params;
   const [movieDetails, streamingServices] = await Promise.all([
     fetchMovie(id),
