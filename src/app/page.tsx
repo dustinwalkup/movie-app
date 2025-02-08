@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getPoster, getReleaseYear } from "@/lib/utils";
 import { fetchMovies } from "@/lib/services/tmdb";
 import { MovieType } from "@/lib/types";
-import SearchInput from "@/components/search-input";
+import { SearchInput } from "@/components/";
 
 interface SearchParamsProps {
   searchParams: Promise<{ q: string }>;
@@ -13,6 +13,11 @@ interface SearchParamsProps {
 export default async function Home({ searchParams }: SearchParamsProps) {
   const { q } = await searchParams;
   const movies = await fetchMovies(q);
+
+  if (q?.length > 0 && !movies) {
+    return <div className="h-screen w-full text-red-500">Loading...</div>;
+  }
+
   return (
     <div className="flex h-screen flex-col items-center justify-start p-8 sm:p-20">
       <SearchInput initialQuery={q} />
