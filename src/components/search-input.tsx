@@ -39,7 +39,6 @@ export default function SearchInput({
         type="text"
         onChange={(e) => handleInputChange(e.target.value)}
         defaultValue={initialQuery}
-        className="text-black"
       />
     </div>
   );
