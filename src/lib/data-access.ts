@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from "uuid";
 
 import { db } from "./db/drizzle";
 import { InsertMovie, movies, users, watchlist } from "./db/schema";
-import { fetchMovie } from "./services/tmdb";
 
 /******************************************************************************
  * USERS

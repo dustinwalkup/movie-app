@@ -34,7 +34,7 @@ export default function WatchlistButton({
     () => !isOnWatchlist,
   );
 
-  const [isPending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
 
   async function clientAction() {
     startTransition(() => {

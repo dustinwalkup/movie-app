@@ -51,6 +51,8 @@ export default function StreamingIcon({
 }: StreamingIconProps) {
   const photoPath: string = streamerIDtoImageMapper[source_id];
 
+  console.log("web_url", web_url);
+
   if (!photoPath) {
     return <span>{name}</span>;
   }
