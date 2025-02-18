@@ -19,38 +19,43 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   }
 
   return (
-    <div className="flex h-screen flex-col items-center justify-start p-8 sm:p-20">
+    <main className="flex h-screen flex-col items-center justify-start p-6 sm:p-20">
       <SearchInput initialQuery={q} />
-      <div className="grid grid-cols-2 gap-8 pt-4 text-white sm:grid-cols-2 sm:p-12 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-3 gap-2 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {movies.length > 0 ? (
           movies.map((movie: MovieType) => {
             const releaseDate = getReleaseYear(movie.release_date);
             return (
-              <div key={movie.id} className="">
+              <div key={movie.id} className="w-24 md:w-40">
                 <Link
                   href={`/movie/${movie.id}`}
-                  className="flex h-full flex-col items-center justify-between"
+                  className="flex h-full flex-col items-start justify-between"
                 >
-                  <p className="mb-4 text-center text-sm md:text-base">
-                    <strong>{movie.title}</strong> ({releaseDate})
-                  </p>
-                  <Image
-                    alt={`Movie Poster for ${movie.title} (${releaseDate})`}
-                    src={getPoster(movie)}
-                    width={160}
-                    height={240}
-                    className="object-fit h-32 w-24 md:h-60 md:w-40"
-                  />
+                  <div className="h-36 w-24 overflow-hidden rounded-sm md:h-60 md:w-40">
+                    <Image
+                      alt={`Movie Poster for ${movie.title} (${releaseDate})`}
+                      src={getPoster(movie)}
+                      width={192}
+                      height={288}
+                      className="object-fit h-full transition-transform hover:scale-105"
+                    />
+                  </div>
+                  <div className="mt-2">
+                    <p className="text-sm font-bold text-slate-50">
+                      {movie.title}
+                    </p>
+                    <p className="text-xs text-gray-400">{releaseDate}</p>
+                  </div>
                 </Link>
               </div>
             );
           })
         ) : (
-          <div className="col-span-4 h-full w-full items-center justify-center">
+          <div className="col-span-6 h-full w-full items-center justify-center">
             {q?.length > 0 ? "No movies found." : "Search by movie title!"}
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

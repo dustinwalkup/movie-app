@@ -18,18 +18,25 @@ export interface MovieType {
   id: number;
   overview: string;
   poster_path: string;
+  backdrop_path: string;
   runtime: number;
   release_date: string;
   title: string;
 }
 
 export interface StreamingServiceItem {
-  display_priority: number;
-  provider_id: number;
-  provider_name: string;
-  logo_path: string;
+  source_id: number;
+  name: string;
+  type: "free" | "sub" | "rent" | "buy";
+  region: string;
+  ios_url: string | null;
+  android_url: string | null;
+  web_url: string;
+  format: string | null;
+  price: number | null;
+  seasons: number;
+  episodes: number;
 }
-
 export interface StreamingCountry {
   link: string;
   buy: StreamingServiceItem[];
