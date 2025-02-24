@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import debounce from "debounce";
 import { Input } from "./ui/input";
@@ -13,6 +13,7 @@ export default function SearchInput({
   const { replace } = useRouter();
   const searchParams = useSearchParams();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [query, setQuery] = useState(initialQuery || "");
 
   useEffect(() => {
     if (inputRef.current) {
@@ -20,7 +21,8 @@ export default function SearchInput({
     }
   }, []);
 
-  const handleInputChange = debounce((newQuery: string) => {
+  // Debounced function to update the URL and trigger the API call
+  const debouncedUpdate = debounce((newQuery: string) => {
     const params = new URLSearchParams(searchParams);
 
     if (newQuery) {
@@ -32,14 +34,39 @@ export default function SearchInput({
     replace(`/?${params.toString()}`);
   }, 300);
 
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newQuery = e.target.value;
+      setQuery(newQuery);
+      debouncedUpdate(newQuery);
+    },
+    [],
+  );
+
+  const handleClear = () => {
+    setQuery(""); // Reset the input value to an empty string
+    const params = new URLSearchParams(searchParams);
+    params.delete("q");
+    replace(`/?${params.toString()}`);
+  };
+
   return (
-    <div>
+    <div className="relative">
       <Input
         ref={inputRef}
         type="text"
-        onChange={(e) => handleInputChange(e.target.value)}
-        defaultValue={initialQuery}
+        onChange={handleInputChange}
+        value={query}
+        className="pr-10"
       />
+      {query && (
+        <button
+          onClick={handleClear}
+          className="absolute right-2 top-1/2 -translate-y-1/2 transform cursor-pointer text-xl text-gray-500"
+        >
+          &times;
+        </button>
+      )}
     </div>
   );
 }
