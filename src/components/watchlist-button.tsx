@@ -47,14 +47,12 @@ export default function WatchlistButton({
     return (
       <Dialog>
         <DialogTrigger>
-          <div className="flex items-center gap-2">
-            <span className="flex items-center gap-2">
-              <span className="rounded-full bg-gray-200 bg-opacity-20 p-2 text-base">
-                <PlusIcon className="size-4" />
-              </span>
-              <span className="text-sm">My watchlist</span>
+          <span className="flex items-center gap-2">
+            <span className="rounded-full bg-gray-200 bg-opacity-20 p-2 text-base">
+              <PlusIcon className="size-4" />
             </span>
-          </div>
+            <span className="text-sm">My watchlist</span>
+          </span>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>

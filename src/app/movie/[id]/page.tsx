@@ -1,9 +1,9 @@
 import Image from "next/image";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { VideoCameraIcon } from "@heroicons/react/24/outline";
 
 import {
   getDirector,
+  getMostResentTrailer,
   getPoster,
   getReleaseYear,
   getRuntime,
@@ -11,7 +11,7 @@ import {
 } from "@/lib/utils";
 import { fetchMovie } from "@/lib/services/tmdb";
 import { fetchStreamingServices } from "@/lib/services/watch-mode";
-import { StreamingIcon, WatchlistButton } from "@/components";
+import { StreamingIcon, WatchlistButton, TrailerButton } from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isMovieInWatchlist } from "@/lib/data-access";
 
@@ -41,6 +41,7 @@ export default async function Movie({ params }: MovieParams) {
   const title = `${movieDetails?.title} (${getReleaseYear(movieDetails?.release_date)})`;
   const director = getDirector(movieDetails?.credits.crew);
   const runtime = getRuntime(movieDetails?.runtime);
+  const trailer = getMostResentTrailer(movieDetails);
   const genres = movieDetails?.genres;
   const { freeSub, buy, rent } = parseStreamingServices(streamingAvailability);
 
@@ -50,7 +51,7 @@ export default async function Movie({ params }: MovieParams) {
 
   const defaultTab = isFreeSub ? "free-subscription" : isRent ? "rent" : "buy";
 
-  // console.log("movieDetails", movieDetails);
+  // console.log("movieDetails", movieDetails.videos);
   // console.log("streamingServices", streamingServices);
 
   // const flatrate = streamingServices?.flatrate;
@@ -104,12 +105,7 @@ export default async function Movie({ params }: MovieParams) {
             tmdbMovieId={id}
             isLoggedIn={isLoggedIn}
           />
-          <span className="flex items-center gap-2">
-            <span className="rounded-full bg-gray-200 bg-opacity-20 p-2 text-base">
-              <VideoCameraIcon className="size-4" />
-            </span>
-            <span className="text-sm">Trailer</span>
-          </span>
+          {trailer && <TrailerButton trailer={trailer} />}
         </div>
         <div className="mb-4 text-sm">
           <p>Directed by {director}</p>
@@ -121,7 +117,7 @@ export default async function Movie({ params }: MovieParams) {
             ))}
         </div>
         <p className="mb-3">{movieDetails?.overview}</p>
-        <Tabs defaultValue={defaultTab} className="w-[400px] text-sm">
+        <Tabs defaultValue={defaultTab} className="text-sm">
           <TabsList>
             {isFreeSub && (
               <TabsTrigger value="free-subscription">

@@ -37,7 +37,7 @@ export async function fetchMovie(id: string): Promise<MovieType | null> {
 
   try {
     const res = await fetch(
-      `${process.env.TMDB_BASE_URL}/movie/${id}?append_to_response=credits`,
+      `${process.env.TMDB_BASE_URL}/movie/${id}?append_to_response=credits,videos`,
       {
         method: "GET",
         headers: {

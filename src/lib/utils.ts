@@ -1,7 +1,12 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { CrewMember, MovieType, StreamingServiceItem } from "./types";
+import {
+  CrewMember,
+  MovieType,
+  StreamingServiceItem,
+  TrailerType,
+} from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -94,4 +99,38 @@ export function getPoster(
     return `https://image.tmdb.org/t/p/w400${movieDetails.backdrop_path}`;
   }
   return `https://image.tmdb.org/t/p/w400${movieDetails.poster_path}`;
+}
+
+/**
+ * Retrieves the most recent trailer from the movie details.
+ *
+ * This function filters the list of videos to only include those with the type "Trailer",
+ * then sorts the trailers by their published date in descending order to get the most recent one.
+ * If no trailers are found or there are no videos, it returns `null`.
+ *
+ * @param {MovieType | null} movieDetails - The movie details object, which contains video data.
+ * @returns {Video | null} The most recent trailer video, or `null` if no trailers exist.
+ */
+export function getMostResentTrailer(
+  movieDetails: MovieType | null,
+): TrailerType | null {
+  if (
+    !movieDetails?.videos?.results ||
+    movieDetails.videos.results.length === 0
+  )
+    return null;
+
+  // Filter out the objects that are of type 'Trailer'
+  const trailers = movieDetails.videos.results.filter(
+    (video) => video.type === "Trailer",
+  );
+
+  // Sort trailers by the published date in descending order (most recent first)
+  trailers.sort(
+    (a, b) =>
+      new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+  );
+
+  // Return the most recent trailer (the first one in the sorted array)
+  return trailers[0] || null;
 }
