@@ -11,7 +11,12 @@ import {
 } from "@/lib/utils";
 import { fetchMovie } from "@/lib/services/tmdb";
 import { fetchStreamingServices } from "@/lib/services/watch-mode";
-import { StreamingIcon, WatchlistButton, TrailerButton } from "@/components";
+import {
+  BackButton,
+  StreamingIcon,
+  WatchlistButton,
+  TrailerButton,
+} from "@/components";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { isMovieInWatchlist } from "@/lib/data-access";
 
@@ -51,62 +56,35 @@ export default async function Movie({ params }: MovieParams) {
 
   const defaultTab = isFreeSub ? "free-subscription" : isRent ? "rent" : "buy";
 
-  // console.log("movieDetails", movieDetails.videos);
-  // console.log("streamingServices", streamingServices);
-
-  // const flatrate = streamingServices?.flatrate;
-  // const ssrent = streamingServices?.rent;
-  // const ssbuy = streamingServices?.buy;
-  // flatrate?.map(({ provider_name, logo_path }) => {
-  //   console.log("Provider name", provider_name);
-  //   console.log(`https://image.tmdb.org/t/p/w400${logo_path}`);
-  // });
-  // ssrent?.map(({ provider_name, logo_path }) => {
-  //   console.log("Provider name", provider_name);
-  //   console.log(`https://image.tmdb.org/t/p/w400${logo_path}`);
-  // });
-  // ssbuy?.map(({ provider_name, logo_path }) => {
-  //   console.log("Provider name", provider_name);
-  //   console.log(`https://image.tmdb.org/t/p/w400${logo_path}`);
-  // });
-
   return (
     <main className="">
-      <div className="">
-        <div className="relative flex h-[230px] w-full flex-col items-center overflow-hidden">
-          <Image
-            alt={title}
-            src={getPoster(movieDetails, true)}
-            width={400}
-            height={230}
-            priority
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute bottom-0 left-0 bg-opacity-10 p-4 text-lg font-bold text-white shadow-lg">
-            {movieDetails?.title}
-          </div>
+      <BackButton title={movieDetails?.title} />
+      <div className="relative flex h-[230px] w-full flex-col items-center overflow-hidden">
+        <div className="absolute bottom-0 z-10 h-1/4 w-full bg-gradient-to-b from-transparent to-black" />
+        <Image
+          alt={title}
+          src={getPoster(movieDetails, true)}
+          width={400}
+          height={230}
+          priority
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute bottom-0 left-0 z-20 bg-opacity-10 px-4 py-1 text-lg font-bold text-white shadow-lg">
+          {movieDetails?.title}
         </div>
-        <div className="flex justify-between px-4 py-1">
-          <div>
-            {runtime && (
-              <span className="pr-1 text-sm text-gray-300">{runtime} |</span>
-            )}
-            <span className="text-sm text-gray-300">
-              {getReleaseYear(movieDetails?.release_date)}
-            </span>
-          </div>
+      </div>
+      <div className="flex justify-between px-4 py-1">
+        <div>
+          {runtime && (
+            <span className="pr-1 text-sm text-gray-300">{runtime} |</span>
+          )}
+          <span className="text-sm text-gray-300">
+            {getReleaseYear(movieDetails?.release_date)}
+          </span>
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="mb-4 flex gap-3">
-          <WatchlistButton
-            isOnWatchlist={isOnWatchlist}
-            tmdbMovieId={id}
-            isLoggedIn={isLoggedIn}
-          />
-          {trailer && <TrailerButton trailer={trailer} />}
-        </div>
+      <div className="px-4 py-2">
         <div className="mb-4 text-sm">
           <p>Directed by {director}</p>
           {genres &&
@@ -115,6 +93,14 @@ export default async function Movie({ params }: MovieParams) {
                 {genre.name} {idx < genres.length - 1 && " | "}
               </span>
             ))}
+        </div>
+        <div className="mb-4 flex gap-3">
+          <WatchlistButton
+            isOnWatchlist={isOnWatchlist}
+            tmdbMovieId={id}
+            isLoggedIn={isLoggedIn}
+          />
+          {trailer && <TrailerButton trailer={trailer} />}
         </div>
         <p className="mb-3">{movieDetails?.overview}</p>
         <Tabs defaultValue={defaultTab} className="text-sm">
