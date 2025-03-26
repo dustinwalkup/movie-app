@@ -1,11 +1,6 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { StreamingServiceItem } from "@/lib/types";
 
 interface StreamingIconProps {
@@ -42,25 +37,20 @@ const streamerIDtoImageMapper: Record<number, string> = {
   391: "/brands/plutotv.avif",
   398: "/brands/microsoft-store.webp",
   439: "/brands/plex.webp",
+  463: "/brands/plex.webp",
   443: "/brands/spectrum.webp",
   444: "/brands/paramount.webp",
 };
 
-export default function StreamingIcon({
-  streamingItem: { source_id, name, web_url },
-}: StreamingIconProps) {
+export default function StreamingIcon({ streamingItem }: StreamingIconProps) {
+  const { source_id, name, web_url, price, format, type } = streamingItem;
   const photoPath: string = streamerIDtoImageMapper[source_id];
-
-  console.log("web_url", web_url);
-
-  if (!photoPath) {
-    return <span>{name}</span>;
-  }
+  const isDisplayPrice = type === "rent" || type === "buy";
 
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
+    <div className="flex flex-col items-center justify-center gap-2">
+      <Link href={web_url} target="_blank" rel="noopener noreferrer">
+        {photoPath ? (
           <Image
             alt={name}
             src={photoPath}
@@ -68,11 +58,18 @@ export default function StreamingIcon({
             height={40}
             className="rounded-lg object-cover"
           />
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{name}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        ) : (
+          <div className="flex size-10 items-center justify-center truncate rounded-lg bg-gray-500">
+            {name}
+          </div>
+        )}
+      </Link>
+      {isDisplayPrice && (
+        <div className="flex flex-col items-center justify-center text-xs text-gray-400">
+          <p>${price?.toFixed(2)}</p>
+          <p>{format}</p>
+        </div>
+      )}
+    </div>
   );
 }

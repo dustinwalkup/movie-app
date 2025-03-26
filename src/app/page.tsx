@@ -40,12 +40,12 @@ export default async function Home({ searchParams }: SearchParamsProps) {
                       className="object-fit h-full transition-transform hover:scale-105"
                     />
                   </div>
-                  <div className="mt-2">
+                  {/* <div className="mt-2">
                     <p className="text-sm font-bold text-slate-50">
                       {movie.title}
                     </p>
                     <p className="text-xs text-gray-400">{releaseDate}</p>
-                  </div>
+                  </div> */}
                 </Link>
               </div>
             );

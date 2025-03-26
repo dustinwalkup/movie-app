@@ -60,14 +60,14 @@ export default async function Movie({ params }: MovieParams) {
     <main className="">
       <BackButton title={movieDetails?.title} />
       <div className="relative flex h-[230px] w-full flex-col items-center overflow-hidden">
-        <div className="absolute bottom-0 z-10 h-1/4 w-full bg-gradient-to-b from-transparent to-black" />
+        <div className="absolute bottom-0 z-20 h-1/3 w-full bg-gradient-to-b from-transparent to-black" />
         <Image
           alt={title}
           src={getPoster(movieDetails, true)}
           width={400}
           height={230}
           priority
-          className="h-full w-full object-cover"
+          className="h-full w-full overflow-hidden object-cover"
         />
         <div className="absolute bottom-0 left-0 z-20 bg-opacity-10 px-4 py-1 text-lg font-bold text-white shadow-lg">
           {movieDetails?.title}
