@@ -42,10 +42,14 @@ const streamerIDtoImageMapper: Record<number, string> = {
   444: "/brands/paramount.webp",
 };
 
+const DO_NOT_DISPLAY: number[] = [385];
+
 export default function StreamingIcon({ streamingItem }: StreamingIconProps) {
   const { source_id, name, web_url, price, format, type } = streamingItem;
   const photoPath: string = streamerIDtoImageMapper[source_id];
   const isDisplayPrice = type === "rent" || type === "buy";
+
+  if (DO_NOT_DISPLAY.includes(source_id)) return null;
 
   return (
     <div className="flex flex-col items-center justify-center gap-2">

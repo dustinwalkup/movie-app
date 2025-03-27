@@ -21,17 +21,20 @@ export default async function Home({ searchParams }: SearchParamsProps) {
   return (
     <main className="flex h-screen flex-col items-center justify-start p-6 sm:p-20">
       <SearchInput initialQuery={q} />
-      <div className="grid grid-cols-3 gap-2 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
         {movies.length > 0 ? (
           movies.map((movie: MovieType) => {
             const releaseDate = getReleaseYear(movie.release_date);
             return (
-              <div key={movie.id} className="w-24 md:w-40">
+              <div
+                key={movie.id}
+                className="w-(--poster-width) [--poster-width:160px] md:w-40"
+              >
                 <Link
                   href={`/movie/${movie.id}`}
                   className="flex h-full flex-col items-start justify-between"
                 >
-                  <div className="h-36 w-24 overflow-hidden rounded-sm md:h-60 md:w-40">
+                  <div className="h-60 w-[--poster-width] overflow-hidden rounded-md md:h-60 md:w-40">
                     <Image
                       alt={`Movie Poster for ${movie.title} (${releaseDate})`}
                       src={getPoster(movie)}
