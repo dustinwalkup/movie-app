@@ -161,7 +161,6 @@ export const getWatchlist = cache(async () => {
   }
 
   try {
-    // Query the database for the user's watchlist
     const watchlistItems = await db
       .select()
       .from(watchlist)
@@ -170,7 +169,6 @@ export const getWatchlist = cache(async () => {
 
     return watchlistItems;
   } catch (error) {
-    // Handle any errors during the database operation
     console.error("Error fetching watchlist from DB:", error);
     throw new Error("Failed to retrieve watchlist from the database.");
   }

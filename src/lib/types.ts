@@ -51,6 +51,10 @@ export interface StreamingServiceItem {
   seasons: number;
   episodes: number;
 }
+
+export interface StreamingDataError {
+  success: boolean;
+}
 export interface StreamingCountry {
   link: string;
   buy: StreamingServiceItem[];

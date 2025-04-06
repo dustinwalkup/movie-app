@@ -75,24 +75,27 @@ export default async function Movie({ params }: MovieParams) {
       </div>
       <div className="flex justify-between px-4 py-1">
         <div>
-          {runtime && (
-            <span className="pr-1 text-sm text-gray-300">{runtime} |</span>
-          )}
-          <span className="text-sm text-gray-300">
-            {getReleaseYear(movieDetails?.release_date)}
-          </span>
+          {genres &&
+            genres.map((genre, idx) => (
+              <span key={genre.id} className="text-sm text-gray-300">
+                {genre.name} {idx < genres.length - 1 && "  •  "}
+              </span>
+            ))}
         </div>
       </div>
 
       <div className="px-4 py-2">
         <div className="mb-4 text-sm">
           <p>Directed by {director}</p>
-          {genres &&
-            genres.map((genre, idx) => (
-              <span key={genre.id}>
-                {genre.name} {idx < genres.length - 1 && " | "}
-              </span>
-            ))}
+          <div>
+            <span className="text-sm text-gray-300">
+              {getReleaseYear(movieDetails?.release_date)}
+            </span>{" "}
+            <span className="px-1">•</span>{" "}
+            {runtime && (
+              <span className="pr-1 text-sm text-gray-300">{runtime}</span>
+            )}
+          </div>
         </div>
         <div className="mb-4 flex gap-3">
           <WatchlistButton

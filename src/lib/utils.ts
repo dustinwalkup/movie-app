@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import {
   CrewMember,
   MovieType,
+  StreamingDataError,
   StreamingServiceItem,
   TrailerType,
 } from "./types";
@@ -33,6 +34,11 @@ export function getRuntime(runtime: number | undefined): string | null {
   return `${hours}h ${minutes}m`;
 }
 
+// Type guard to check if the data is an error object
+function isStreamingDataError(data: any): data is StreamingDataError {
+  return data && data.success === false;
+}
+
 /**
  * Parse the streaming services into free, subscription, buy, and rent categories.
  *
@@ -43,7 +49,7 @@ export function getRuntime(runtime: number | undefined): string | null {
  *   - `buy`: Services where you can buy content.
  */
 export function parseStreamingServices(
-  streamingData: StreamingServiceItem[] | null,
+  streamingData: StreamingServiceItem[] | StreamingDataError,
 ): {
   freeSub: StreamingServiceItem[];
   rent: StreamingServiceItem[];
@@ -54,7 +60,10 @@ export function parseStreamingServices(
     rent: [] as StreamingServiceItem[],
     buy: [] as StreamingServiceItem[],
   };
-  if (!streamingData) {
+
+  // Check if streamingData is an error object using the type guard
+  if (isStreamingDataError(streamingData)) {
+    console.log("Error: Streaming data request failed", streamingData);
     return result;
   }
 
