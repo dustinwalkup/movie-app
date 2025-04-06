@@ -29,7 +29,7 @@ export default function MobileNav() {
       <div className="flex w-full items-center justify-between px-4 text-white">
         <button
           aria-label="Toggle Menu"
-          className="relative flex size-8 items-center justify-center focus:outline-none"
+          className="relative flex size-8 items-center justify-center focus:outline-hidden"
           onClick={() => setIsOpen(!isOpen)}
         >
           <div className="relative flex h-[.8rem] w-6 flex-col items-center justify-between">
@@ -81,7 +81,7 @@ export default function MobileNav() {
             <input
               type="text"
               placeholder="Search or jump to..."
-              className="w-full rounded-md border px-4 py-2 focus:outline-none"
+              className="w-full rounded-md border px-4 py-2 focus:outline-hidden"
             />
             <button className="mt-4 w-full rounded-md bg-black py-3 font-semibold text-white">
               Sign up

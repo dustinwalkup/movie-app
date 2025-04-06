@@ -60,7 +60,7 @@ export default async function Movie({ params }: MovieParams) {
     <main className="">
       <BackButton title={movieDetails?.title} />
       <div className="relative flex h-[230px] w-full flex-col items-center overflow-hidden">
-        <div className="absolute bottom-0 z-20 h-1/3 w-full bg-gradient-to-b from-transparent to-black" />
+        <div className="absolute bottom-0 z-20 h-1/3 w-full bg-linear-to-b from-transparent to-black" />
         <Image
           alt={title}
           src={getPoster(movieDetails, true)}

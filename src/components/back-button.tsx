@@ -35,7 +35,7 @@ export default function BackButton({ title }: BackButtonProps) {
       <button
         type="button"
         onClick={() => router.back()}
-        className={`fixed left-0 top-0 z-30 m-4 flex aspect-[1/1] items-center justify-center rounded-full bg-opacity-20 p-2 text-base ${isScrolled ? "" : "bg-gray-200"} `}
+        className={`fixed left-0 top-0 z-30 m-4 flex aspect-1/1 items-center justify-center rounded-full bg-opacity-20 p-2 text-base ${isScrolled ? "" : "bg-gray-200"} `}
       >
         <ChevronLeftIcon className="size-4" />
       </button>

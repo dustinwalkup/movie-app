@@ -34,7 +34,7 @@ export default async function Search({ searchParams }: SearchParamsProps) {
                   href={`/movie/${movie.id}`}
                   className="flex h-full flex-col items-start justify-between"
                 >
-                  <div className="h-60 w-[--poster-width] overflow-hidden rounded-md md:h-60 md:w-40">
+                  <div className="h-60 w-(--poster-width) overflow-hidden rounded-md md:h-60 md:w-40">
                     <Image
                       alt={`Movie Poster for ${movie.title} (${releaseDate})`}
                       src={getPoster(movie)}
