@@ -61,8 +61,3 @@ export interface StreamingCountry {
   flatrate: StreamingServiceItem[];
   rent: StreamingServiceItem[];
 }
-
-// export interface StreamingServiceType {
-//   id: number;
-//   results: StreamingCountry[];
-// }

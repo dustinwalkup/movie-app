@@ -31,7 +31,7 @@ export default function SearchInput({
       params.delete("q");
     }
 
-    replace(`/?${params.toString()}`);
+    replace(`/search/?${params.toString()}`);
   }, 300);
 
   const handleInputChange = useCallback(
@@ -62,7 +62,7 @@ export default function SearchInput({
       {query && (
         <button
           onClick={handleClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 transform cursor-pointer text-xl text-gray-500"
+          className="absolute top-1/2 right-2 -translate-y-1/2 transform cursor-pointer text-xl text-gray-500"
         >
           &times;
         </button>

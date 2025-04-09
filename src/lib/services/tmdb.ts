@@ -51,7 +51,9 @@ export async function fetchMovie(id: string): Promise<MovieType | null> {
       throw new Error("Failed to fetch movie details");
     }
 
-    return await res.json();
+    const result = await res.json();
+    // console.log("result", result);
+    return result;
   } catch (error) {
     console.error("Error fetching movie:", error);
     return null;

@@ -3,28 +3,53 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  Bars2Icon,
-  XMarkIcon,
-  VideoCameraIcon,
-} from "@heroicons/react/24/outline";
+  LogoutLink,
+  useKindeBrowserClient,
+} from "@kinde-oss/kinde-auth-nextjs";
 
+import { AuthModal, Icon } from ".";
+import { IconName } from "./icon";
 import Link from "next/link";
-import { Video } from "lucide-react";
 
-const navItems = [
-  "Product",
-  "Solutions",
-  "Resources",
-  "Open Source",
-  "Enterprise",
-  "Pricing",
+interface NavItem {
+  label: string;
+  href: string;
+  icon: IconName;
+}
+
+const navItems: NavItem[] = [
+  {
+    label: "Search",
+    href: "/search",
+    icon: "magnifying-glass",
+  },
+  {
+    label: "Watchlist",
+    href: "/watchlist",
+    icon: "list-bullet",
+  },
+  {
+    label: "Account",
+    href: "/account",
+    icon: "user",
+  },
 ];
 
 export default function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isNavigationTriggered, setIsNavigationTriggered] = useState(false);
+  const { isAuthenticated } = useKindeBrowserClient();
+
+  function handleNavigationTrigger() {
+    setIsNavigationTriggered(true);
+    setIsOpen(false);
+    setTimeout(() => {
+      setIsNavigationTriggered(false);
+    }, 1000);
+  }
 
   return (
-    <nav className="[--nav-height: '60px'] h-(--nav-height) relative z-50 flex w-full items-center bg-[#010026]">
+    <nav className="bg-tertiary relative z-50 flex h-(--nav-height) w-full items-center [--nav-height:--spacing(15)]">
       {/* Top Nav */}
       <div className="flex w-full items-center justify-between px-4 text-white">
         <button
@@ -34,7 +59,7 @@ export default function MobileNav() {
         >
           <div className="relative flex h-[.8rem] w-6 flex-col items-center justify-between">
             <motion.span
-              className="absolute h-0.5 w-6 origin-center rounded bg-white"
+              className="bg-primary absolute h-0.5 w-6 origin-center rounded"
               animate={{
                 rotate: isOpen ? 45 : 0,
                 y: isOpen ? 5 : 0,
@@ -42,7 +67,7 @@ export default function MobileNav() {
               transition={{ duration: 0.3 }}
             />
             <motion.span
-              className="absolute top-2.5 h-0.5 w-6 origin-center rounded bg-white"
+              className="bg-primary absolute top-2.5 h-0.5 w-6 origin-center rounded"
               animate={{
                 rotate: isOpen ? -45 : 0,
                 y: isOpen ? -5 : 0,
@@ -52,43 +77,68 @@ export default function MobileNav() {
           </div>
         </button>
 
-        <VideoCameraIcon className="size-8 text-white" />
+        <Link
+          href="/"
+          className="border-primary bg-secondary absolute left-[50%] -translate-x-1/2 rounded-sm border p-1.5"
+        >
+          <Icon name="video-camera" className="text-primary size-8" />
+        </Link>
 
-        <button className="rounded-md border border-white px-4 py-1">
-          Sign in
-        </button>
+        {isAuthenticated && (
+          <LogoutLink className="text-primary rounded-md border border-none px-4 py-1 text-sm">
+            Sign out
+          </LogoutLink>
+        )}
+        {!isAuthenticated && (
+          <AuthModal>
+            <span className="text-primary rounded-md border border-none px-4 py-1 text-sm">
+              Sign in
+            </span>
+          </AuthModal>
+        )}
       </div>
 
       {/* Slide-up Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ height: 0 }} // Start from off-screen top
-          animate={{ height: "100%" }} // Animate to its normal position
-          exit={{ y: "-100%" }} // Exit back to the top
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed left-0 right-0 top-16 h-full bg-white px-6 pt-4 shadow-xl"
+      <motion.div
+        initial={{ height: 0, visibility: isOpen ? "visible" : "hidden" }}
+        animate={{
+          height: isOpen ? 800 : 0,
+          visibility: isOpen ? "visible" : "hidden",
+        }}
+        transition={{
+          duration: isNavigationTriggered ? 0 : 0.3,
+          stiffness: 200,
+          damping: 10,
+        }}
+        className="bg-tertiary fixed top-(--nav-height) right-0 left-0 h-full px-6 pt-4 shadow-xl"
+      >
+        <motion.ul
+          initial={{ visibility: isOpen ? "visible" : "hidden" }}
+          animate={{
+            visibility: isOpen ? "visible" : "hidden",
+          }}
+          transition={{
+            duration: isNavigationTriggered ? 0 : 0.15,
+            stiffness: 200,
+            damping: 10,
+          }}
+          className="space-y-6 text-lg font-medium text-gray-900"
         >
-          <ul className="space-y-6 text-lg font-medium text-gray-900">
-            {navItems.map((item) => (
-              <li key={item} className="flex items-center justify-between">
-                {item}
-                <span className="text-gray-400">{">"}</span>
+          {navItems.map(({ label, icon, href }, idx) => (
+            <Link
+              key={idx}
+              href={href}
+              className="flex items-center gap-2 text-white"
+              onMouseUp={handleNavigationTrigger}
+            >
+              <li key={idx} className="flex items-center gap-2 text-white">
+                <Icon name={icon} className="size-5" />
+                {label}
               </li>
-            ))}
-          </ul>
-
-          <div className="mt-8">
-            <input
-              type="text"
-              placeholder="Search or jump to..."
-              className="w-full rounded-md border px-4 py-2 focus:outline-hidden"
-            />
-            <button className="mt-4 w-full rounded-md bg-black py-3 font-semibold text-white">
-              Sign up
-            </button>
-          </div>
-        </motion.div>
-      )}
+            </Link>
+          ))}
+        </motion.ul>
+      </motion.div>
     </nav>
   );
 }

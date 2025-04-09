@@ -4,10 +4,12 @@ import { cache } from "react";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import { and, eq } from "drizzle-orm";
-import { v4 as uuidv4 } from "uuid";
 
 import { db } from "./db/drizzle";
-import { InsertMovie, movies, users, watchlist } from "./db/schema";
+import { users, watchlist } from "./db/schema";
+import { MovieType } from "./types";
+import { tryCatch } from "./try-catch";
+import { getDirector } from "./utils";
 
 /******************************************************************************
  * USERS
@@ -115,34 +117,6 @@ export const getDBUser = cache(async () => {
 });
 
 /******************************************************************************
- * MOVIES
- ******************************************************************************/
-
-/**
- * Gets a movie from the database by its TMDb ID.  If the movie doesn't exist,
- * it returns null.
- */
-export const getMovieByTmdbId = cache(async (tmdbId: string) => {
-  const movie = await db
-    .select()
-    .from(movies)
-    .where(eq(movies.tmdbId, tmdbId))
-    .execute();
-  return movie.length > 0 ? movie[0] : null;
-});
-
-/**
- * Adds a movie to the database.  Generates a UUID for the internal movie ID.
- */
-export const addMovie = cache(async (movieData: InsertMovie) => {
-  const newMovieId = uuidv4();
-  return await db
-    .insert(movies)
-    .values({ id: newMovieId, ...movieData })
-    .returning();
-});
-
-/******************************************************************************
  * WATCHLIST
  ******************************************************************************/
 
@@ -157,103 +131,100 @@ export const getWatchlist = cache(async () => {
   const { user } = await verifySession();
 
   if (!user || !user.id) {
-    throw new Error("User is not authenticated or missing ID.");
+    return {
+      data: [],
+      error: new Error("User is not authenticated or missing ID."),
+    };
   }
 
-  try {
-    const watchlistItems = await db
-      .select()
-      .from(watchlist)
-      .where(eq(watchlist.userId, user.id))
-      .execute();
-
-    return watchlistItems;
-  } catch (error) {
-    console.error("Error fetching watchlist from DB:", error);
-    throw new Error("Failed to retrieve watchlist from the database.");
-  }
+  return await tryCatch(
+    db.select().from(watchlist).where(eq(watchlist.userId, user.id)).execute(),
+  );
 });
 
 /**
  * Adds a movie to the watchlist for a user.
  * The function first verifies if the user is authenticated by checking the session.
  *
- * @param {number} movieId - The ID of the movie to add to the watchlist.
- * @returns {Promise<void>} Resolves once the movie is added to the watchlist.
+ * @param {MovieType} movieDetails - The details of the movie to add to the watchlist.
+ * @returns {Promise<{ success: boolean, watchlistItemId?: string, error?: any }>} Resolves once the movie is added to the watchlist.
  */
-export const addToWatchlist = cache(async (movieId: string) => {
+export const addToWatchlist = cache(async (movieDetails: MovieType) => {
   const { user } = await verifySession();
+
   if (!user || !user.id) {
     throw new Error("User is not authenticated or missing ID.");
   }
 
-  try {
-    await db.insert(watchlist).values({ userId: user.id, movieId }).execute();
-    return { success: true, watchlistItemId: movieId };
-  } catch (dbError) {
-    console.error("Error adding to watchlist:", dbError);
-    return { success: false, error: dbError };
-  }
+  return await tryCatch(
+    db
+      .insert(watchlist)
+      .values({
+        userId: user.id,
+        tmdbId: Number(movieDetails.id),
+        title: movieDetails.title,
+        directedBy: getDirector(movieDetails.credits.crew) || "Unknown",
+        posterPath: movieDetails.poster_path,
+        overview: movieDetails.overview,
+        releaseDate: movieDetails.release_date,
+        runtime: movieDetails.runtime,
+      })
+      .execute(),
+  );
 });
 
 /**
  * Removes a movie from the watchlist for a user.
  * The function first verifies if the user is authenticated by checking the session.
  *
- * @param {number} movieId - The ID of the movie to remove from the watchlist.
+ * @param {number} tmdbId - The ID of the movie to remove from the watchlist.
  * @returns {Promise<void>} Resolves once the movie is removed from the watchlist.
  */
-export const removeFromWatchlist = cache(async (movieId: string) => {
+export const removeFromWatchlist = cache(async (tmdbId: number) => {
   const { user } = await verifySession();
   if (!user || !user.id) {
     throw new Error("User is not authenticated or missing ID.");
   }
 
-  try {
-    await db
+  return await tryCatch(
+    db
       .delete(watchlist)
-      .where(and(eq(watchlist.userId, user.id), eq(watchlist.movieId, movieId)))
-      .execute();
-    return { success: true };
-  } catch (error) {
-    console.error("Error removing movie from watchlist:", error);
-    return { success: false, error: error };
-  }
+      .where(and(eq(watchlist.userId, user.id), eq(watchlist.tmdbId, tmdbId)))
+      .execute(),
+  );
 });
 
 /**
  * Checks if a movie is in a user's watchlist.
  *
  * @param {string} userId - The ID of the user.
- * @param {string} movieId - The ID of the movie.
+ * @param {number} tmdbId - The ID of the movie via TMDb.
  * @returns {Promise<boolean>} True if the movie is in the watchlist, false otherwise.
  */
 export const isMovieInWatchlist = cache(
-  async (movieId: string): Promise<boolean> => {
+  async (tmdbId: number): Promise<boolean> => {
     const { user } = await verifySession(false);
 
     if (!user || !user.id) {
       return false;
     }
-    try {
-      const movie = await getMovieByTmdbId(movieId);
 
-      if (!movie || !movie.id) {
-        return false;
-      }
+    const { data: existingWatchlistItem, error: watchlistError } =
+      await tryCatch(
+        db
+          .select()
+          .from(watchlist)
+          .where(
+            and(eq(watchlist.userId, user.id), eq(watchlist.tmdbId, tmdbId)),
+          )
+          .execute(),
+      );
 
-      const existingWatchlistItem = await db
-        .select()
-        .from(watchlist)
-        .where(
-          and(eq(watchlist.userId, user.id), eq(watchlist.movieId, movie.id)),
-        )
-        .execute();
-
-      return existingWatchlistItem.length > 0;
-    } catch (error) {
-      console.error("Error checking watchlist:", error);
+    if (watchlistError) {
+      console.error("Error checking watchlist:", watchlistError);
       return false;
     }
+
+    return existingWatchlistItem.length > 0;
   },
 );

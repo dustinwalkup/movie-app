@@ -26,19 +26,17 @@ type MovieParams = {
 
 export default async function Movie({ params }: MovieParams) {
   const { id } = await params;
-  const [
-    movieDetails,
-    // streamingServices,
-    isOnWatchlist,
-    streamingAvailability,
-  ] = await Promise.all([
-    fetchMovie(id),
-    // fetchStreamingServices(id),
-    isMovieInWatchlist(id),
-    fetchStreamingServices(id),
-  ]);
 
-  // console.log("streamingAvailability", streamingAvailability);
+  const [movieDetails, isOnWatchlist, streamingAvailability] =
+    await Promise.all([
+      fetchMovie(id),
+      isMovieInWatchlist(Number(id)),
+      fetchStreamingServices(id),
+    ]);
+
+  if (!movieDetails) {
+    return <div>Movie not found</div>;
+  }
 
   const { isAuthenticated } = await getKindeServerSession();
   const isLoggedIn = await isAuthenticated();
@@ -69,7 +67,7 @@ export default async function Movie({ params }: MovieParams) {
           priority
           className="h-full w-full overflow-hidden object-cover"
         />
-        <div className="absolute bottom-0 left-0 z-20 bg-opacity-10 px-4 py-1 text-lg font-bold text-white shadow-lg">
+        <div className="bg-opacity-10 absolute bottom-0 left-0 z-20 px-4 py-1 text-lg font-bold text-white shadow-lg">
           {movieDetails?.title}
         </div>
       </div>
@@ -100,7 +98,7 @@ export default async function Movie({ params }: MovieParams) {
         <div className="mb-4 flex gap-3">
           <WatchlistButton
             isOnWatchlist={isOnWatchlist}
-            tmdbMovieId={id}
+            movieDetails={movieDetails}
             isLoggedIn={isLoggedIn}
           />
           {trailer && <TrailerButton trailer={trailer} />}

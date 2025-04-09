@@ -102,7 +102,6 @@ export function getPoster(
   movieDetails: MovieType | null,
   retrieveBackdrop: boolean = false,
 ): string {
-  console.log("movieDetails", movieDetails?.poster_path);
   if (!movieDetails?.poster_path) return "/images/film-stock-new.jpg";
   if (retrieveBackdrop && movieDetails.backdrop_path) {
     return `https://image.tmdb.org/t/p/w400${movieDetails.backdrop_path}`;
