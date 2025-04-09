@@ -35,6 +35,7 @@ export function getRuntime(runtime: number | undefined): string | null {
 }
 
 // Type guard to check if the data is an error object
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isStreamingDataError(data: any): data is StreamingDataError {
   return data && data.success === false;
 }
