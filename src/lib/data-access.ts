@@ -8,8 +8,8 @@ import { and, eq } from "drizzle-orm";
 import { db } from "./db/drizzle";
 import { users, watchlist } from "./db/schema";
 import { MovieType } from "./types";
-import { tryCatch } from "./try-catch";
 import { getDirector } from "./utils";
+import { tryCatch } from "@walkup/walkup-utils";
 
 /******************************************************************************
  * USERS

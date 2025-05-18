@@ -1,9 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-
+import { tryCatch } from "@walkup/walkup-utils";
 import { addToWatchlist, removeFromWatchlist } from "./data-access";
-import { tryCatch } from "./try-catch";
 import { MovieType } from "./types";
 
 /**

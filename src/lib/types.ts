@@ -34,6 +34,7 @@ export interface MovieType {
   poster_path: string;
   backdrop_path: string;
   runtime: number;
+  vote_average: number;
   release_date: string;
   title: string;
 }

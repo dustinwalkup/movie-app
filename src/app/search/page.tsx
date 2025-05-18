@@ -1,16 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
 
-import { getPoster, getReleaseYear } from "@/lib/utils";
 import { fetchMovies } from "@/lib/services/tmdb";
 import { MovieType } from "@/lib/types";
-import { SearchInput } from "@/components/";
+import { MovieCard, SearchInput } from "@/components/";
+import { MovieCardSkeleton } from "@/components/skeletons";
 
 interface SearchParamsProps {
   searchParams: Promise<{ q: string }>;
 }
 
-export default async function Search({ searchParams }: SearchParamsProps) {
+const NUMBER_OF_SKELETONS = 20;
+
+export default async function SearchPage({ searchParams }: SearchParamsProps) {
   const { q } = await searchParams;
   const movies = await fetchMovies(q);
 
@@ -21,10 +22,25 @@ export default async function Search({ searchParams }: SearchParamsProps) {
   return (
     <main className="flex h-screen flex-col items-center justify-start p-6 sm:p-20">
       <SearchInput initialQuery={q} />
-      <div className="grid grid-cols-2 gap-3 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {movies.length > 0 ? (
+      <div className="grid grid-cols-2 gap-4 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
+        {q?.length > 0 && !movies ? (
+          // Render skeletons while loading
+          Array.from({ length: NUMBER_OF_SKELETONS }).map((_, index) => (
+            <div
+              key={`skeleton-${index}`}
+              className="w-(--poster-width) [--poster-width:160px] md:w-40"
+            >
+              <div className="flex h-full flex-col items-start justify-between">
+                <MovieCardSkeleton
+                  width={192}
+                  aspectRatio="portrait"
+                  height={288}
+                />
+              </div>
+            </div>
+          ))
+        ) : movies.length > 0 ? (
           movies.map((movie: MovieType) => {
-            const releaseDate = getReleaseYear(movie.release_date);
             return (
               <div
                 key={movie.id}
@@ -34,21 +50,13 @@ export default async function Search({ searchParams }: SearchParamsProps) {
                   href={`/movie/${movie.id}`}
                   className="flex h-full flex-col items-start justify-between"
                 >
-                  <div className="h-60 w-(--poster-width) overflow-hidden rounded-md md:h-60 md:w-40">
-                    <Image
-                      alt={`Movie Poster for ${movie.title} (${releaseDate})`}
-                      src={getPoster(movie)}
-                      width={192}
-                      height={288}
-                      className="object-fit h-full transition-transform hover:scale-105"
-                    />
-                  </div>
-                  {/* <div className="mt-2">
-                    <p className="text-sm font-bold text-slate-50">
-                      {movie.title}
-                    </p>
-                    <p className="text-xs text-gray-400">{releaseDate}</p>
-                  </div> */}
+                  <MovieCard
+                    movie={movie}
+                    className="w-(--poster-width)"
+                    aspectRatio="portrait"
+                    width={192}
+                    height={288}
+                  />
                 </Link>
               </div>
             );
