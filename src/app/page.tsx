@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { MovieCard2 } from "@/components/movie-card2";
 import { StreamingPlatform } from "@/components/streaming-platform";
 import { FilterChip } from "@/components/filter-chip";
-import SearchInput2 from "@/components/search-input2";
+import { SearchForm } from "@/components/search-form";
 
 // Hero Section
 const HERO_TITLE = "Find Where to Stream Any Movie";
@@ -83,7 +83,7 @@ export default async function Home() {
           </p>
 
           <div className="mt-10 w-full max-w-md">
-            <SearchInput2 />
+            <SearchForm />
           </div>
 
           <div className="flex gap-4">

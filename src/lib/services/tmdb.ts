@@ -89,3 +89,88 @@ export async function fetchMovie(id: string): Promise<MovieType | null> {
 //     return null;
 //   }
 // }
+
+const TMDB_API_KEY = process.env.TMDB_API_KEY;
+const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+
+export interface Movie {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string;
+  vote_average: number;
+  vote_count: number;
+  genre_ids: number[];
+  adult: boolean;
+  original_language: string;
+  original_title: string;
+  popularity: number;
+  video: boolean;
+}
+
+export interface TMDBResponse {
+  page: number;
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+}
+
+export async function searchMovies(
+  query: string,
+  page = 1,
+): Promise<TMDBResponse> {
+  if (!TMDB_API_KEY) {
+    throw new Error("TMDB API key not configured");
+  }
+
+  const response = await fetch(
+    `${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`,
+    { next: { revalidate: 300 } }, // Cache for 5 minutes
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch from TMDB");
+  }
+
+  return response.json();
+}
+
+export async function getMoviesByCategory(
+  category: string,
+  page = 1,
+): Promise<TMDBResponse> {
+  if (!TMDB_API_KEY) {
+    throw new Error("TMDB API key not configured");
+  }
+
+  let endpoint = "";
+  switch (category) {
+    case "popular":
+      endpoint = "movie/popular";
+      break;
+    case "top_rated":
+      endpoint = "movie/top_rated";
+      break;
+    case "upcoming":
+      endpoint = "movie/upcoming";
+      break;
+    case "now_playing":
+      endpoint = "movie/now_playing";
+      break;
+    default:
+      endpoint = "movie/popular";
+  }
+
+  const response = await fetch(
+    `${TMDB_BASE_URL}/${endpoint}?api_key=${TMDB_API_KEY}&page=${page}`,
+    { next: { revalidate: 300 } }, // Cache for 5 minutes
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch from TMDB");
+  }
+
+  return response.json();
+}

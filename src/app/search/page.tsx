@@ -1,72 +1,143 @@
-import Link from "next/link";
+import { Suspense } from "react";
+import { AlertCircle } from "lucide-react";
 
-import { fetchMovies } from "@/lib/services/tmdb";
-import { MovieType } from "@/lib/types";
-import { MovieCard, SearchInput } from "@/components/";
-import { MovieCardSkeleton } from "@/components/skeletons";
+import {
+  searchMovies,
+  getMoviesByCategory,
+  type Movie,
+} from "@/lib/services/tmdb";
+import { SearchForm } from "@/components/search-form";
+import { CategoryNavigation } from "@/components/category-navigation";
+import { ClearResultsButton } from "@/components/clear-results-button";
+import { LoadMoreButton } from "@/components/load-more-button";
+import { MovieCard } from "@/components/movie-card3";
 
-interface SearchParamsProps {
-  searchParams: Promise<{ q: string }>;
+interface SearchPageProps {
+  searchParams: {
+    q?: string;
+    category?: string;
+    page?: string;
+  };
 }
 
-const NUMBER_OF_SKELETONS = 20;
+async function MovieResults({
+  searchParams,
+}: {
+  searchParams: SearchPageProps["searchParams"];
+}) {
+  const query = searchParams.q;
+  const category = searchParams.category;
+  const page = Number.parseInt(searchParams.page || "1");
 
-export default async function SearchPage({ searchParams }: SearchParamsProps) {
-  const { q } = await searchParams;
-  const movies = await fetchMovies(q);
-
-  if (q?.length > 0 && !movies) {
-    return <div className="h-screen w-full text-red-500">Loading...</div>;
+  if (!query && !category) {
+    return <CategoryNavigation />;
   }
 
-  return (
-    <main className="flex h-screen flex-col items-center justify-start p-6 sm:p-20">
-      <SearchInput initialQuery={q} />
-      <div className="grid grid-cols-2 gap-4 pt-8 text-white sm:p-12 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-        {q?.length > 0 && !movies ? (
-          // Render skeletons while loading
-          Array.from({ length: NUMBER_OF_SKELETONS }).map((_, index) => (
-            <div
-              key={`skeleton-${index}`}
-              className="w-(--poster-width) [--poster-width:160px] md:w-40"
-            >
-              <div className="flex h-full flex-col items-start justify-between">
-                <MovieCardSkeleton
-                  width={192}
-                  aspectRatio="portrait"
-                  height={288}
-                />
-              </div>
-            </div>
-          ))
-        ) : movies.length > 0 ? (
-          movies.map((movie: MovieType) => {
-            return (
-              <div
-                key={movie.id}
-                className="w-(--poster-width) [--poster-width:160px] md:w-40"
-              >
-                <Link
-                  href={`/movie/${movie.id}`}
-                  className="flex h-full flex-col items-start justify-between"
-                >
-                  <MovieCard
-                    movie={movie}
-                    className="w-(--poster-width)"
-                    aspectRatio="portrait"
-                    width={192}
-                    height={288}
-                  />
-                </Link>
-              </div>
-            );
-          })
-        ) : (
-          <div className="col-span-6 h-full w-full items-center justify-center">
-            {q?.length > 0 ? "No movies found." : "Search by movie title!"}
-          </div>
-        )}
+  try {
+    let data;
+    let searchType = "";
+
+    if (query) {
+      data = await searchMovies(query, page);
+      searchType = `Search Results for "${query}"`;
+    } else if (category) {
+      data = await getMoviesByCategory(category, page);
+      const categoryNames: Record<string, string> = {
+        popular: "Popular Movies",
+        top_rated: "Top Rated Movies",
+        upcoming: "Coming Soon",
+        now_playing: "Now Playing",
+      };
+      searchType = categoryNames[category] || "Movies";
+    }
+
+    if (!data || data.results.length === 0) {
+      return (
+        <div className="p-12 text-center">
+          <h3 className="mb-2 text-xl font-semibold">No movies found</h3>
+          <p className="text-muted-foreground mb-4">
+            Try searching with different keywords or browse our categories
+          </p>
+          <ClearResultsButton />
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold">{searchType}</h2>
+          <ClearResultsButton />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
+          {data.results.map((movie: Movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))}
+        </div>
+
+        <LoadMoreButton currentPage={data.page} totalPages={data.total_pages} />
       </div>
-    </main>
+    );
+  } catch (error) {
+    console.error("Error fetching movies:", error);
+    return (
+      <div className="flex items-center justify-center p-8 text-center">
+        <div className="text-destructive flex items-center gap-2">
+          <AlertCircle className="h-5 w-5" />
+          <span>Failed to load movies. Please try again.</span>
+        </div>
+      </div>
+    );
+  }
+}
+
+function MovieResultsSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div className="bg-muted h-8 w-48 animate-pulse rounded" />
+        <div className="bg-muted h-10 w-32 animate-pulse rounded" />
+      </div>
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6 lg:grid-cols-4 xl:grid-cols-5">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="space-y-3">
+            <div className="bg-muted aspect-[2/3] animate-pulse rounded-lg" />
+            <div className="space-y-2">
+              <div className="bg-muted h-4 animate-pulse rounded" />
+              <div className="bg-muted h-3 w-3/4 animate-pulse rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function MovieSearchPage({ searchParams }: SearchPageProps) {
+  return (
+    <div className="bg-background min-h-screen">
+      {/* Header */}
+      <header className="bg-background/80 sticky top-0 z-50 border-b backdrop-blur-md">
+        <div className="container mx-auto px-4 py-6">
+          <div className="mb-6 text-center">
+            <h1 className="mb-2 text-3xl font-bold md:text-4xl">
+              Movie Search
+            </h1>
+            <p className="text-muted-foreground">
+              Discover your next favorite movie
+            </p>
+          </div>
+          <SearchForm />
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <Suspense fallback={<MovieResultsSkeleton />}>
+          <MovieResults searchParams={searchParams} />
+        </Suspense>
+      </main>
+    </div>
   );
 }

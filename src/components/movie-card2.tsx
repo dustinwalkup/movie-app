@@ -1,8 +1,8 @@
+import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import { MovieType } from "@/lib/types";
 import { getPoster, getReleaseYear } from "@/lib/utils";
-import Link from "next/link";
 
 export function MovieCard2({ movie }: { movie: MovieType }) {
   return (
@@ -22,7 +22,7 @@ export function MovieCard2({ movie }: { movie: MovieType }) {
         <div className="absolute right-0 bottom-0 left-0 p-2 sm:p-4">
           <div className="flex items-start justify-between">
             <div className="max-w-[70%]">
-              <h3 className="line-clamp-2 text-xs font-bold sm:text-sm md:text-base">
+              <h3 className="group-hover:text-primary line-clamp-2 text-xs font-bold sm:text-sm md:text-base">
                 {movie.title}
               </h3>
               <p className="text-[10px] text-[#b3b3b3] sm:text-xs">
