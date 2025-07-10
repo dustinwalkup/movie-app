@@ -42,7 +42,7 @@ export default async function Movie({ params }: MovieParams) {
   const isLoggedIn = await isAuthenticated();
 
   const title = `${movieDetails?.title} (${getReleaseYear(movieDetails?.release_date)})`;
-  const director = getDirector(movieDetails?.credits.crew);
+  const director = getDirector(movieDetails?.credits?.crew);
   const runtime = getRuntime(movieDetails?.runtime);
   const trailer = getMostResentTrailer(movieDetails);
   const genres = movieDetails?.genres;
