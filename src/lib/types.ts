@@ -24,10 +24,10 @@ export interface Genre {
 }
 
 export interface MovieType {
-  credits: {
+  credits?: {
     crew: CrewMember[];
   };
-  videos: { results: TrailerType[] };
+  videos?: { results: TrailerType[] };
   genres: Genre[];
   id: number;
   overview: string;
@@ -37,6 +37,8 @@ export interface MovieType {
   vote_average: number;
   release_date: string;
   title: string;
+  // Temporary properties for filtering
+  streaming_services?: StreamingServiceItem[];
 }
 
 export interface StreamingServiceItem {
