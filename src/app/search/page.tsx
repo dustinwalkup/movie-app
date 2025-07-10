@@ -11,6 +11,7 @@ import { CategoryNavigation } from "@/components/category-navigation";
 import { ClearResultsButton } from "@/components/clear-results-button";
 import { LoadMoreButton } from "@/components/load-more-button";
 import { MovieCard } from "@/components/movie-card3";
+import { SearchFormSkeleton } from "@/components/skeletons";
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -131,7 +132,9 @@ export default async function MovieSearchPage({
               Discover your next favorite movie
             </p>
           </div>
-          <SearchForm />
+          <Suspense fallback={<SearchFormSkeleton />}>
+            <SearchForm />
+          </Suspense>
         </div>
       </header>
 

@@ -3,6 +3,7 @@ import {
   RegisterLink,
   LoginLink,
 } from "@kinde-oss/kinde-auth-nextjs/components";
+import { Suspense } from "react";
 
 import { fetchMovie } from "@/lib/services/tmdb";
 import { MovieType } from "@/lib/types";
@@ -12,6 +13,7 @@ import { MovieCard2 } from "@/components/movie-card2";
 import { StreamingPlatform } from "@/components/streaming-platform";
 import { FilterChip } from "@/components/filter-chip";
 import { SearchForm } from "@/components/search-form";
+import { SearchFormSkeleton } from "@/components/skeletons";
 
 // Hero Section
 const HERO_TITLE = "Find Where to Stream Any Movie";
@@ -83,7 +85,9 @@ export default async function Home() {
           </p>
 
           <div className="mt-10 w-full max-w-md">
-            <SearchForm />
+            <Suspense fallback={<SearchFormSkeleton />}>
+              <SearchForm />
+            </Suspense>
           </div>
 
           <div className="flex gap-4">

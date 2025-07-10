@@ -163,7 +163,7 @@ export const addToWatchlist = cache(async (movieDetails: MovieType) => {
         userId: user.id,
         tmdbId: Number(movieDetails.id),
         title: movieDetails.title,
-        directedBy: getDirector(movieDetails.credits.crew) || "Unknown",
+        directedBy: getDirector(movieDetails?.credits?.crew) || "Unknown",
         posterPath: movieDetails.poster_path,
         overview: movieDetails.overview,
         releaseDate: movieDetails.release_date,
