@@ -13,11 +13,11 @@ import { LoadMoreButton } from "@/components/load-more-button";
 import { MovieCard } from "@/components/movie-card3";
 
 interface SearchPageProps {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     category?: string;
     page?: string;
-  };
+  }>;
 }
 
 async function MovieResults({
@@ -25,9 +25,10 @@ async function MovieResults({
 }: {
   searchParams: SearchPageProps["searchParams"];
 }) {
-  const query = searchParams.q;
-  const category = searchParams.category;
-  const page = Number.parseInt(searchParams.page || "1");
+  const resolvedSearchParams = await searchParams;
+  const query = resolvedSearchParams.q;
+  const category = resolvedSearchParams.category;
+  const page = Number.parseInt(resolvedSearchParams.page || "1");
 
   if (!query && !category) {
     return <CategoryNavigation />;
@@ -114,7 +115,9 @@ function MovieResultsSkeleton() {
   );
 }
 
-export default function MovieSearchPage({ searchParams }: SearchPageProps) {
+export default async function MovieSearchPage({
+  searchParams,
+}: SearchPageProps) {
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
